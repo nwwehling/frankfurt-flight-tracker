@@ -1,6 +1,6 @@
 class FlightTracker {
     constructor() {
-        this.apiBaseUrl = 'http://localhost:8080/api';
+        this.apiBaseUrl = 'https://web-production-37aa.up.railway.app/api';
         this.currentPage = 1;
         this.flightsPerPage = 20;
         this.allFlights = [];
