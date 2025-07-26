@@ -25,7 +25,7 @@ OPENSKY_USERNAME = "nicklasmw"
 OPENSKY_PASSWORD = "gezqiJ-kufpe4-gujdah"
 
 # Database Configuration
-DATABASE_PATH = "data/flights.db"
+DATABASE_PATH = "flights.db"
 
 # Web Server Configuration
 FLASK_HOST = "0.0.0.0"

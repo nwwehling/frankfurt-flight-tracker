@@ -23,10 +23,23 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
+# Database helper function
+def get_db_path():
+    """Get the appropriate database path for the current environment"""
+    if os.getenv('RAILWAY_ENVIRONMENT'):
+        # In Railway, use working directory
+        return DATABASE_PATH
+    else:
+        # Local development, use data directory
+        db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "flights.db")
+        # Ensure data directory exists for local development
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        return db_path
+
 # Database setup
 def init_db():
-    # Use absolute path for database
-    db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), DATABASE_PATH)
+    # Railway-friendly database path
+    db_path = get_db_path()
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute('''
@@ -237,7 +250,7 @@ def process_flight_data():
     flights, fetch_time = fetch_flight_data()
     
     # Use absolute path for database
-    db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), DATABASE_PATH)
+    db_path = get_db_path()
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
@@ -338,7 +351,7 @@ def start_data_collection():
 def get_flights():
     """Get all recorded flights"""
     # Use absolute path for database
-    db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), DATABASE_PATH)
+    db_path = get_db_path()
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
@@ -375,7 +388,7 @@ def get_flights():
 def get_closest_flights():
     """Get only the closest point for each flight"""
     # Use absolute path for database
-    db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), DATABASE_PATH)
+    db_path = get_db_path()
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
@@ -412,7 +425,7 @@ def get_closest_flights():
 def get_stats():
     """Get statistics about recorded flights"""
     # Use absolute path for database
-    db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), DATABASE_PATH)
+    db_path = get_db_path()
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
@@ -445,7 +458,7 @@ def get_stats():
 def get_closest_aircraft():
     """Get the aircraft that came closest to target coordinates"""
     # Use absolute path for database
-    db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), DATABASE_PATH)
+    db_path = get_db_path()
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
@@ -484,7 +497,7 @@ def get_closest_aircraft():
 def get_lowest_aircraft():
     """Get the aircraft that flew at the lowest altitude"""
     # Use absolute path for database
-    db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), DATABASE_PATH)
+    db_path = get_db_path()
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
@@ -523,7 +536,7 @@ def get_lowest_aircraft():
 def get_fastest_aircraft():
     """Get the aircraft that flew at the highest speed"""
     # Use absolute path for database
-    db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), DATABASE_PATH)
+    db_path = get_db_path()
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
@@ -571,7 +584,7 @@ def get_filtered_flights():
     tracking_number = request.args.get('tracking_number', type=str)
     
     # Use absolute path for database
-    db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), DATABASE_PATH)
+    db_path = get_db_path()
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
@@ -653,7 +666,7 @@ def fix_timezone():
     """Fix existing flight timestamps by adding 2 hours (UTC to local time)"""
     try:
         # Use absolute path for database
-        db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), DATABASE_PATH)
+        db_path = get_db_path()
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
