@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frankfurt Flight Tracker</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-plane"></i> Frankfurt Flight Tracker</h1>
+            <p>Monitoring aircraft departing from FRA within 2km of target coordinates</p>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-plane-departure"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="total-flights">0</h3>
+                    <p>Total Flights</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-day"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="flights-today">0</h3>
+                    <p>Flights Today</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-mountain"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="avg-altitude">0 ft</h3>
+                    <p>Avg Altitude</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-tachometer-alt"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="avg-speed">0 kts</h3>
+                    <p>Avg Speed</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="flights-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-list"></i> Recent Flights</h2>
+                    <div class="controls">
+                        <button id="refresh-btn" class="btn btn-primary">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="filters-section">
+                    <h3><i class="fas fa-filter"></i> Filters</h3>
+                    <div class="filters-grid">
+                        <div class="filter-group">
+                            <label for="altitude-min">Min Altitude (ft):</label>
+                            <input type="number" id="altitude-min" placeholder="0" min="0" max="5000">
+                        </div>
+                        <div class="filter-group">
+                            <label for="altitude-max">Max Altitude (ft):</label>
+                            <input type="number" id="altitude-max" placeholder="5000" min="0" max="5000">
+                        </div>
+                        <div class="filter-group">
+                            <label for="distance-min">Min Distance (km):</label>
+                            <input type="number" id="distance-min" placeholder="0" min="0" max="2" step="0.1">
+                        </div>
+                        <div class="filter-group">
+                            <label for="distance-max">Max Distance (km):</label>
+                            <input type="number" id="distance-max" placeholder="2" min="0" max="2" step="0.1">
+                        </div>
+                        <div class="filter-group">
+                            <label for="speed-min">Min Speed (kts):</label>
+                            <input type="number" id="speed-min" placeholder="0" min="0">
+                        </div>
+                        <div class="filter-group">
+                            <label for="speed-max">Max Speed (kts):</label>
+                            <input type="number" id="speed-max" placeholder="500" min="0">
+                        </div>
+                        <div class="filter-group">
+                            <label for="tracking-number">Tracking Number:</label>
+                            <input type="text" id="tracking-number" placeholder="ICAO24 code">
+                        </div>
+                        <div class="filter-group">
+                            <button id="apply-filters" class="btn btn-secondary">
+                                <i class="fas fa-search"></i> Apply Filters
+                            </button>
+                            <button id="clear-filters" class="btn btn-outline">
+                                <i class="fas fa-times"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flights-table-container">
+                    <table class="flights-table">
+                        <thead>
+                            <tr>
+                                <th>Flight Number</th>
+                                <th>Altitude (ft)</th>
+                                <th>Speed (kts)</th>
+                                <th>Distance (km)</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="flights-tbody">
+                            <!-- Flight data will be populated here -->
+                        </tbody>
+                    </table>
+                    
+                    <!-- Pagination Controls -->
+                    <div class="pagination-container">
+                        <div class="pagination-info">
+                            <label for="flights-per-page">Flights per page:</label>
+                            <select id="flights-per-page" class="select">
+                                <option value="10">10</option>
+                                <option value="20" selected>20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                        <div class="pagination-controls">
+                            <button id="prev-page" class="btn btn-outline">
+                                <i class="fas fa-chevron-left"></i> Previous
+                            </button>
+                            <span id="page-info" class="page-info">Page 1 of 1</span>
+                            <button id="next-page" class="btn btn-outline">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="map-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-map-marker-alt"></i> Target Area</h2>
+                    </div>
+                    <div class="map-info">
+                        <div class="map-card">
+                            <h3>Monitoring Zone</h3>
+                            <p><strong>Target Coordinates:</strong> 49.949857, 8.635253</p>
+                            <p><strong>Radius:</strong> 2.0 km</p>
+                            <p><strong>Max Altitude:</strong> 5,000 ft</p>
+                            <p><strong>Airport:</strong> Frankfurt (FRA)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="special-aircraft-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-star"></i> Special Aircraft</h2>
+                    </div>
+                    
+                    <div class="special-aircraft-grid">
+                        <div class="special-card" id="closest-aircraft">
+                            <div class="special-icon">
+                                <i class="fas fa-crosshairs"></i>
+                            </div>
+                            <div class="special-content">
+                                <h3>Closest Aircraft</h3>
+                                <div class="aircraft-info">
+                                    <p><strong>ID:</strong> <span class="aircraft-id">-</span></p>
+                                    <p><strong>Distance:</strong> <span class="aircraft-distance">-</span></p>
+                                    <p><strong>Altitude:</strong> <span class="aircraft-altitude">-</span></p>
+                                    <p><strong>Speed:</strong> <span class="aircraft-speed">-</span></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="special-card" id="lowest-aircraft">
+                            <div class="special-icon">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                            <div class="special-content">
+                                <h3>Lowest Aircraft</h3>
+                                <div class="aircraft-info">
+                                    <p><strong>ID:</strong> <span class="aircraft-id">-</span></p>
+                                    <p><strong>Altitude:</strong> <span class="aircraft-altitude">-</span></p>
+                                    <p><strong>Speed:</strong> <span class="aircraft-speed">-</span></p>
+                                    <p><strong>Distance:</strong> <span class="aircraft-distance">-</span></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="special-card" id="fastest-aircraft">
+                            <div class="special-icon">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <div class="special-content">
+                                <h3>Fastest Aircraft</h3>
+                                <div class="aircraft-info">
+                                    <p><strong>ID:</strong> <span class="aircraft-id">-</span></p>
+                                    <p><strong>Speed:</strong> <span class="aircraft-speed">-</span></p>
+                                    <p><strong>Altitude:</strong> <span class="aircraft-altitude">-</span></p>
+                                    <p><strong>Distance:</strong> <span class="aircraft-distance">-</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="loading-overlay" id="loading">
+            <div class="loading-spinner">
+                <i class="fas fa-plane"></i>
+                <p>Loading flight data...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for flight details -->
+    <div id="flight-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="modal-close">&times;</span>
+            <h2>Flight Details</h2>
+            <div id="modal-details">
+                <!-- Details will be populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <p>For questions or feedback:</p>
+                <p><a href="mailto:nmwehling@icloud.com">nmwehling@icloud.com</a></p>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Data Attribution</h4>
+                <p>Flight data provided by <a href="https://opensky-network.org" target="_blank">The OpenSky Network</a></p>
+                <p class="citation">
+                    <strong>Citation:</strong> Matthias Schäfer, Martin Strohmeier, Vincent Lenders, Ivan Martinovic and Matthias Wilhelm.
+                    "Bringing Up OpenSky: A Large-scale ADS-B Sensor Network for Research".
+                    In Proceedings of the 13th IEEE/ACM International Symposium on Information Processing in Sensor Networks (IPSN), pages 83-94, April 2014.
+                </p>
+            </div>
+            
+            <div class="footer-section">
+                <h4>About</h4>
+                <p>Frankfurt Airport Flight Tracker</p>
+                <p>Real-time flight monitoring around Frankfurt am Main (FRA)</p>
+                <p class="copyright">&copy; 2025 Flight Tracker. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html> 

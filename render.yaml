@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: flight-tracker-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: cd backend && python app.py
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: PORT
+        value: 8080
+    plan: free 
