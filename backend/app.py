@@ -18,6 +18,15 @@ from pytz import timezone
 OPENSKY_CLIENT_ID = "nicklasmw-api-client"
 OPENSKY_CLIENT_SECRET = "YkQ4Ak015t5dE9Pqed1i93HD0xUZ1oFf"
 
+def is_within_collection_hours():
+    """Check if current time is within data collection hours (5 AM - 11 PM German time)"""
+    berlin_tz = timezone('Europe/Berlin')
+    current_time = datetime.now(berlin_tz)
+    current_hour = current_time.hour
+    
+    # Collection hours: 5 AM (05:00) to 11 PM (23:00)
+    return 5 <= current_hour < 23
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -247,6 +256,13 @@ def fetch_route_info(callsign, icao24=None):
 
 def process_flight_data():
     """Process and store flight data"""
+    # Check if we're within collection hours (5 AM - 11 PM German time)
+    if not is_within_collection_hours():
+        berlin_tz = timezone('Europe/Berlin')
+        current_time = datetime.now(berlin_tz)
+        print(f"Outside collection hours (5 AM - 11 PM German time). Current time: {current_time.strftime('%H:%M')} Berlin time")
+        return
+    
     flights, fetch_time = fetch_flight_data()
     
     # Use absolute path for database
