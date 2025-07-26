@@ -5,4 +5,5 @@ builder = "nixpacks"
 startCommand = "cd backend && python app.py"
 
 [env]
-PORT = "8080" 
+PORT = "8080"
+RAILWAY_ENVIRONMENT = "production" 
